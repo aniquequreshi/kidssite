@@ -1,0 +1,15 @@
+{% extends "kidsapp/base.html" %}
+
+{% block title %}Delete Confirmation{% endblock %}
+
+{% block content %}
+
+<h3>Confirm Delete</h3>
+<form method="post">
+    {% csrf_token %}
+  <p>Are you sure you want to delete "{{ denial }}"?</p>
+    <input type="submit" value="Confirm">
+<a href="{% url 'denial-list'  %}">Cancel</a>
+</form>
+
+{% endblock %}
