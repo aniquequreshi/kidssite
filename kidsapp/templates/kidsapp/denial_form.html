@@ -17,20 +17,30 @@
 
 <form action="" method="post">
     {% csrf_token %}
-<table>
-    {{ form.as_table }}
-</table>
-<br>
-    <input type="submit" value="Submit">
 
-
+    <input id='btnSubmit' type="submit" value="Submit">
     <a href="{% url 'denial-list' %}"><button>Cancel</button></a>
+
+    <table>
+        {{ form.as_table }}
+    </table>
+<br>
 
     {% if denial.pk  %}
         {% if perms.kidsapp.delete_denial %}
     &nbsp; &nbsp;   &nbsp; <a href="{% url 'denial-delete' denial.pk %}">Delete</a>
         {% endif %}
     {% endif %}
+
+    {% if not perms.kidsapp.delete_denial %}
+        <script>
+            $(document).ready(function() {
+                $("#id_status option[value='Archive']").remove();
+            })
+        </script>
+
+    {% endif %}
+
 
 </form>
 
@@ -40,6 +50,9 @@
         <button onclick = "myStatusFunction(0)" >Not Started</button><br><br>
         <button onclick = "myStatusFunction(1)" >In Progress</button><br><br>
         <button onclick = "myStatusFunction(2)" >Done</button><br><br>
+        {% if user.get_username == 'admin'  %}
+        <button onclick = "myStatusFunction(3)" >Archive</button><br><br>
+        {% endif %}
         <h4>Quick Notes</h4>
         <button onclick = "myQuicNoteFunction('\nFixed and Rebilled.')">Rebilled</button>
         <button onclick = "myQuicNoteFunction('\nTime Expired.')">Time</button>
@@ -75,6 +88,10 @@
 
     function myStatusFunction(status) {
         $('#id_status').prop('selectedIndex',status);
+        if (status == 3){
+            $('#btnSubmit').click();
+        }
+
     }
 
 
@@ -111,6 +128,9 @@
         $('#id_carrier').prop("readonly", true);
         $('#id_visit_id').prop("readonly", true);
         $('#id_date_of_service').prop("readonly", true);
+        $('#id_procedure').prop("readonly", true);
+        $('#id_date_of_denial').prop("readonly", true);
+        $('#id_amount').prop("readonly", true);
         ///////////////////
         $('#id_reason_code').css({'background-color': 'yellow'});
         $('#id_reason').css({'background-color': 'yellow'});
@@ -118,6 +138,9 @@
         $('#id_carrier').css({'background-color': 'yellow'});
         $('#id_visit_id').css({'background-color': 'yellow'});
         $('#id_date_of_service').css({'background-color': 'yellow'});
+        $('#id_procedure').css({'background-color': 'yellow'});
+        $('#id_date_of_denial').css({'background-color': 'yellow'});
+        $('#id_amount').css({'background-color': 'yellow'});
 
 
 //        var x = $('#id_create_new').val();
@@ -129,6 +152,9 @@
                 $('#id_carrier').prop("readonly", false);
                 $('#id_visit_id').prop("readonly", false);
                 $('#id_date_of_service').prop("readonly", false);
+                $('#id_procedure').prop("readonly", false);
+                $('#id_date_of_denial').prop("readonly", false);
+                $('#id_amount').prop("readonly", false);
             }
             else {
                 $('#id_reason_code').prop("readonly", true);
@@ -137,6 +163,9 @@
                 $('#id_carrier').prop("readonly", true);
                 $('#id_visit_id').prop("readonly", true);
                 $('#id_date_of_service').prop("readonly", true);
+                $('#id_procedure').prop("readonly", true);
+                $('#id_date_of_denial').prop("readonly", true);
+                $('#id_amount').prop("readonly", true);
             }
         })
 

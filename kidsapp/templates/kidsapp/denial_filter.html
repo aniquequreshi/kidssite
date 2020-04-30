@@ -4,6 +4,19 @@
 
 {% block content %}
 
+    {% if not perms.kidsapp.delete_denial %}
+        <script>
+            $(document).ready(function() {
+                $("#id_status option[value='Archive']").remove();
+            })
+        </script>
+
+    {% endif %}
+
+    <button id="btnSaveSettings" onclick="mySetCookieFunction()" >Save Settings</button>
+    <button id="btnClearSettings" onclick="myClearCookieFunction()" >Clear Settings</button>
+{#    <button id="btnGetSettings"  >Get Settings</button>#}
+
     <table>
     <tr>
         <td>
@@ -29,7 +42,7 @@
 <td>
         <button onclick = "myStatusFunction(1)" >Not Started</button><br>
         <button onclick = "myStatusFunction(2)" >In Progress</button><br>
-        <button onclick = "myStatusFunction(3)" >Done</button><br>
+        <button id="btnDone" onclick = "myStatusFunction(3)" >Done</button><br>
 </td>
     </tr>
     </table>
@@ -89,9 +102,12 @@
 
 <script>
     $(document).ready(function() {
-        $('#my-table').DataTable( {
-            "order": [[ 4, "desc" ],[ 2, "asc" ]]  //sort order 0 based columns
-        } );
+        //if (window.location.href)
+       // $("#id_status option[value='Archive']").remove();
+
+        $('#my-table').DataTable({
+            "order": [[4, "desc"], [2, "asc"]]  //sort order 0 based columns
+        });
         $('#id_status').change(function () {
             $('#filter').click();
         })
@@ -111,22 +127,44 @@
             $('#filter').click();
         })
 
-
-
-
         $('#reset').click(function () {
             $('#id_carrier').val("");
             $('#id_reason_code').val("");
             $('#id_visit_id').val("");
             $('#id_follow_up_date_0').val("");
             $('#id_follow_up_date_1').val("");
-            $('#id_status').prop('selectedIndex',0);
+            $('#id_status').prop('selectedIndex', 0);
             $('#filter').click();
         })
 
-        //$('.explain').css( "border", "1px dotted red" );
 
 
+        var a = document.createElement('a');
+        a.href = document.referrer;
+        var currentURL = (window.location.pathname);
+        var referralURL = a.pathname;
+        //alert((a.pathname))
+        if (currentURL != referralURL) {
+        //$('#btnGetSettings').click(function () {
+
+            $('#id_carrier').val(getCookie('carrier'));
+            $('#id_reason_code').val(getCookie('reason'));
+            $('#id_visit_id').val(getCookie('visit_id'));
+            $('#id_follow_up_date_0').val(getCookie('fudate0'));
+            $('#id_follow_up_date_1').val(getCookie('fudate1'));
+            $('#id_status').prop('selectedIndex', getCookie('status'));
+            $('#filter').click();
+        }//)
+
+        $('#id_delete').change(function () {
+            if ($('#id_delete').is(':checked')) {
+               // $('#id_status').append(new Option('Archive', 'Archive'))
+
+            }
+            else {
+               // $("#id_status option[value='Archive']").remove();
+            }
+        })
 
 /*
         $('.explain').hover(
@@ -140,6 +178,9 @@
 */
 
     } );
+
+
+
 
     function myFunction(visit) {
       /* Get the text field */
@@ -167,6 +208,25 @@
         $('#id_carrier').val(x);
         $('#filter').click();
     }
+
+    function mySetCookieFunction(){
+        setCookie('carrier', $('#id_carrier').val(), 1);
+        setCookie('reason', $('#id_reason_code').val(), 1);
+        setCookie('visit_id', $('#id_visit_id').val(), 1);
+        setCookie('fudate0', $('#id_follow_up_date_0').val(), 1);
+        setCookie('fudate1', $('#id_follow_up_date_1').val(), 1);
+        setCookie('status', $('#id_status').prop('selectedIndex'), 1);
+    }
+
+    function myClearCookieFunction(){
+        setCookie('carrier', '', .0000000000000001);
+        setCookie('reason',  '', .0000000000000001);
+        setCookie('visit_id',  '', .0000000000000001);
+        setCookie('fudate0',  '', .0000000000000001);
+        setCookie('fudate1',  '', .0000000000000001);
+        setCookie('status',  '', .0000000000000001);
+    }
+
 
 
     var coll = document.getElementsByClassName("collapsible");
@@ -206,7 +266,39 @@
         $('#filter').click();
     }
 
+    function setCookie(cname, cvalue, exdays) {
+      var d = new Date();
+      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+      var expires = "expires="+d.toUTCString();
+      document.cookie = cname + "=" + cvalue + ";" + expires ;
+    }
 
+    function getCookie(cname) {
+      var name = cname + "=";
+      var ca = document.cookie.split(';');
+      for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    }
+
+  {% comment %}  function checkCookie() {
+      var user = getCookie("username");
+      if (user != "") {
+        alert("Welcome again " + user);
+      } else {
+        user = prompt("Please enter your name:", "");
+        if (user != "" && user != null) {
+          setCookie("username", user, 365);
+        }
+      }
+    }{% endcomment %}
     /*
     function over(reason) {
         document.getElementById(reason).style.display = "none";

@@ -22,6 +22,14 @@ from django.contrib import messages
 def index_view(request):
     return render(request, 'kidsapp/index.html')
 
+@login_required
+@permission_required('kidsapp.delete_denial')
+def denial_delete_archive(request):
+    Denial.objects.filter(status='Archive').delete()
+    template = "kidsapp/denial_upload.html"
+    success_url = reverse_lazy('denial-list')  # was denial-list
+    context = {}
+    return render(request, template, context)
 
 @login_required
 @permission_required('kidsapp.create_denial')
@@ -44,11 +52,14 @@ def denial_upload(request):
     for column in csv.reader(io_string, delimiter='\t', quotechar="|"):
         _, created = Denial.objects.update_or_create(
             visit_id=column[0],
-            carrier_code=column[1].split(' - ', 1)[0],
-            carrier=column[1].split(' - ', 1)[1],
-            reason_code=column[2],
-            reason=column[3].split(': ', 1)[1],
-            date_of_service=column[4]
+            reason_code=column[1],
+            reason=column[2].split(': ', 1)[1],
+            carrier_code=column[3].split(' - ', 1)[0],
+            carrier=column[3].split(' - ', 1)[1],
+            date_of_service=column[4],
+            procedure = column[5],
+            date_of_denial = column[6],
+            amount = column[7]
         )
     context = {}
     return render(request, template, context)

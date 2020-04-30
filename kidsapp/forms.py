@@ -30,6 +30,9 @@ class DenialForm(ModelForm):
                     'date_of_service',
                     'carrier_code',
                     'carrier',
+                    'date_of_denial',
+                    'procedure',
+                    'amount',
 
 
                     #'priority',

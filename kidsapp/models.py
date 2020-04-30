@@ -16,10 +16,12 @@ class Task(models.Model):
     NS = 'Not Started'
     IP = 'In Progress'
     DN = 'Done'
+    AR = 'Archive'
     STATUS_OPTIONS = [
         (NS, 'Not Started'),
         (IP, 'In Progress'),
         (DN, 'Done'),
+        (AR, 'Archive')
     ]
     status = models.CharField(max_length=30, choices=STATUS_OPTIONS, default= NS)
     follow_up_date = models.DateField(null=True, blank=True)
@@ -34,6 +36,9 @@ class Denial(Task):
     reason_code = models.CharField(max_length=10, null=True, blank=True)
     reason = models.TextField(null=True, blank=True)
     date_of_service = models.DateField(null=True, blank=True)
+    procedure =  models.CharField(max_length=30, null=True, blank=True)
+    date_of_denial = models.DateField(null=True, blank=True)
+    amount = models.CharField(max_length=30, null=True, blank=True)
 
     # class Meta:
     #      permissions = (
